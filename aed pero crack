@@ -1,0 +1,69 @@
+#include <iostream>
+#include <thread>
+using namespace std;
+
+int tablero[10][10] = {
+    {0,0,0,0,0,0,0,0,0,0},
+    {0,0,-1,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,-1,0,0,0,0,0,-1},
+    {0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,-1,0,0,0},
+    {0,0,0,0,0,0,-1,0,-1,-1},
+    {0,0,0,0,0,0,0,0,0,0}
+};
+
+int marcas[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
+int *base = *tablero;
+
+void procesar(int inicio, int fin) {
+    int *pini = base + inicio;
+    int *pfin = base + fin;
+
+    for (int *p = pini; p < pfin; p++) {
+        if (*p < 0) {
+            int col = (p - base) % 10;
+            for (int *mar = marcas; mar < marcas+8; mar++) {
+                // Columna izquierda
+                if (col == 0 && (*mar == -1 || *mar == -11 || *mar == 9))
+                    continue;
+                // Columna derecha
+                if (col == 9 && (*mar == 1 || *mar == -9 || *mar == 11))
+                    continue;
+
+                p += *mar;
+                if (*p >= 0)
+                    (*p)++;
+                p -= *mar;
+            }
+        }
+    }
+}
+
+int main() {
+    int total = 100;
+    int bloque = total / 4;
+
+    thread t1(procesar, 0, bloque);
+    thread t2(procesar, bloque, bloque*2);
+    thread t3(procesar, bloque*2, bloque*3);
+    thread t4(procesar, bloque*3, total);
+
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+
+    int contador = 0;
+    for (int *p = base; p < base + total; p++) {
+        if (*p < 0) cout << "* ";
+        else cout << *p << " ";
+        contador++;
+        if (contador == 10) {
+            cout << endl;
+            contador = 0;
+        }
+    }
+}
