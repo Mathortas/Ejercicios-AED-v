@@ -1,0 +1,127 @@
+
+#include <stdio.h>
+#include <iostream>
+#include <cassert>
+using namespace std;
+
+struct Node {
+	int val;
+	Node* next;
+
+	Node(int x) : val(x), next(nullptr) {};
+};
+
+class LinkedList {
+public:
+	Node* head;
+	int nelems;
+public:
+	LinkedList();
+	~LinkedList();
+	void push_back(int x);
+	void push_front(int x);
+	void pop_back();
+	void pop_front();
+	int operator[](int i);
+	void print();
+};
+
+
+LinkedList::LinkedList() {
+	nelems = 0;
+	head = nullptr;
+}
+LinkedList::~LinkedList() {
+	Node** lookingpointer;
+	lookingpointer = &head;
+	while( *lookingpointer ) {
+		Node* temp = *lookingpointer;
+		*lookingpointer = (*lookingpointer)->next;
+		temp = 0;
+	}
+	*lookingpointer = 0;
+	nelems--;
+}
+void LinkedList::push_back(int x) {
+	Node** lookingpointer;
+	lookingpointer = &head;
+	while (*lookingpointer) {
+		lookingpointer = &((*lookingpointer)->next);
+	}
+	*lookingpointer = new Node(x);
+	nelems++;
+}
+
+void LinkedList::push_front(int x) {
+	Node** lookingpointer;
+	Node* temp = head;
+	lookingpointer = &head;
+	*lookingpointer = new Node(x);
+	(*lookingpointer)->next = temp;
+	nelems++;
+}
+
+void LinkedList::pop_back() {
+
+	if(!nelems) {
+		return;
+	}
+
+	Node** lookingpointer;
+	lookingpointer = &head;
+	while( *lookingpointer && (*lookingpointer)->next != 0 ) {
+		lookingpointer = &((*lookingpointer)->next);
+	}
+	*lookingpointer = 0;
+	nelems--;
+}
+
+void LinkedList::pop_front() {
+    if(!nelems){
+	    return;
+	}
+	
+	Node** lookingpointer;
+	lookingpointer = &head;
+	*lookingpointer = (*lookingpointer)->next;
+	nelems--;
+}
+
+int LinkedList::operator[](int i) {
+    if (i>nelems)
+    {
+        return -1;
+    }
+    Node* p = head;
+    int a=0;
+    while(a<i)
+    {
+        p=p->next;
+        a++;
+    }
+    return p->val;
+
+}
+
+
+void LinkedList::print() {
+	Node** lookingpointer;
+	lookingpointer = &head;
+	while (*lookingpointer) {
+		cout <<"->(" <<  (*lookingpointer)->val << ")";
+		*lookingpointer = (*lookingpointer)->next;
+	}
+}
+int main()
+{
+	LinkedList lista;
+	lista.push_front(1);
+	lista.push_front(0);
+	lista.push_back(2);
+	lista.print();
+	cout << endl;
+	cout << lista.nelems << endl;
+	cout << lista[1] << endl;
+
+	return 0;
+}
